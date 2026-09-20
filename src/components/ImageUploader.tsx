@@ -102,7 +102,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         }
       } catch (uploadError) {
         const message = uploadError instanceof Error ? uploadError.message : "Image upload failed.";
-        throw new Error(`${message} Check the API server and its IMGBB_API_KEY configuration.`);
+        setError(message);
+        return;
       }
 
       if (uploadedUrl) {
