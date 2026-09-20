@@ -110,7 +110,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore, onOpenRegis
           setStats(data);
         }
       })
-      .catch((err) => console.error("Stats fetch error:", err));
+      .catch(() => {
+        // Keep the hero usable while the local API is offline.
+        setStats({
+          totalMembers: 0,
+          totalMentors: 0,
+          totalEvents: 0,
+          totalBatches: 0,
+        });
+      });
   }, []);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
