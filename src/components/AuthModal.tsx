@@ -68,19 +68,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setErrorMsg(data.error || "অনুরোধটি ব্যর্থ হয়েছে। তথ্যগুলো পুনরায় চেক করুন।");
       }
     } catch {
-      // Offline fallback demo
-      const demoUser = {
-        token: "demo-jwt-token",
-        role: email.includes("admin") ? "ADMIN" : "MEMBER",
-        profile: {
-          fullName: fullName || (email.split("@")[0] || "Demo User"),
-          batchYear: Number(batchYear),
-          verifiedAlumni: true,
-          occupation: occupation || "Software Engineer",
-        },
-      };
-      onSuccess(demoUser);
-      onClose();
+      setErrorMsg("API server is unavailable. Start the backend on http://localhost:5000 and try again.");
     } finally {
       setIsLoading(false);
     }

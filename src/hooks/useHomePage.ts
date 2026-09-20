@@ -50,7 +50,14 @@ export function useHomePage() {
               Authorization: `Bearer ${parsedUser.token}`,
             },
           })
-            .then((res) => (res.ok ? parseJsonResponse<{ user?: any }>(res) : null))
+            .then((res) => {
+              if (!res.ok) {
+                localStorage.removeItem("alumni_user");
+                setCurrentUser(null);
+                return null;
+              }
+              return parseJsonResponse<{ user?: any }>(res);
+            })
             .then((data) => {
               if (data?.user) {
                 setCurrentUser((prev) => {
@@ -66,7 +73,10 @@ export function useHomePage() {
                 });
               }
             })
-            .catch(() => {});
+            .catch(() => {
+              localStorage.removeItem("alumni_user");
+              setCurrentUser(null);
+            });
         }
       } catch {
         localStorage.removeItem("alumni_user");
