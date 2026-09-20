@@ -99,37 +99,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         }
       }
 
-      // 3. Fallback: Direct ImgBB API upload
-      if (!uploadedUrl) {
-        const cleanBase64 = base64.replace(/^data:image\/\w+;base64,/, "");
-        const formData = new URLSearchParams();
-        formData.append("image", cleanBase64);
-
-        const imgbbKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY ?? "";
-        if (!imgbbKey) {
-          setError("Image upload fallback is not configured. Set NEXT_PUBLIC_IMGBB_API_KEY in your environment.");
-          return;
-        }
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formData.toString(),
-        });
-
-        if (res.ok) {
-          const result = await parseJsonResponse<{ success?: boolean; data?: { url?: string } }>(res);
-          if (result.success && result.data?.url) {
-            uploadedUrl = result.data.url;
-          }
-        }
-      }
-
       if (uploadedUrl) {
         onChange(uploadedUrl);
       } else {
-        setError("Failed to upload image to ImgBB.");
+        setError("Image upload failed. Check the API server and its IMGBB_API_KEY configuration.");
       }
     } catch (err) {
       console.error("Upload error:", err);
