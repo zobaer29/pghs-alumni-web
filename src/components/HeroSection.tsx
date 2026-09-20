@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, Users, Award, ChevronRight, ChevronLeft, BookOpen, Calendar, HeartHandshake, Image as ImageIcon, Sparkles, ExternalLink } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 
 interface HeroSectionProps {
   onExplore: (tab: string) => void;
@@ -104,7 +104,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore, onOpenRegis
 
   useEffect(() => {
     fetch(apiUrl("/api/stats"))
-      .then((res) => res.json())
+      .then((res) => parseJsonResponse<typeof stats>(res))
       .then((data) => {
         if (data && typeof data.totalMembers === "number") {
           setStats(data);

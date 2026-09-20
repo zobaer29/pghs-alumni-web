@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Lock, Mail, User, GraduationCap, Phone, Briefcase, ShieldCheck } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -59,7 +59,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
 
       if (res.ok) {
         onSuccess(data);

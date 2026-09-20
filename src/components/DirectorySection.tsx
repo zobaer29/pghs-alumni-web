@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { confirmAction, showError, showSuccess } from "@/lib/alerts";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 import { Search, Filter, ShieldCheck, MapPin, Briefcase, GraduationCap, Mail, Phone, RefreshCw, Trash2, Lock, LogIn, User, X, Globe, Link, HeartHandshake, Award, LoaderCircle } from "lucide-react";
 
 interface DirectorySectionProps {
@@ -39,7 +39,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({ currentUser,
       });
 
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseJsonResponse<{ users?: any[]; pagination?: { page?: number; totalPages?: number } }>(res);
         setAlumniMembers((prev) => (append ? [...prev, ...(data.users || [])] : data.users || []));
         setCurrentPage(data.pagination?.page || page);
         setHasMore((data.pagination?.page || page) < (data.pagination?.totalPages || page));

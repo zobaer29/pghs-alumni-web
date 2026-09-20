@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ShieldAlert, CheckCircle, XCircle, RefreshCw, Calendar, PlusCircle, DollarSign, MapPin, Mail } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 import { ImageUploader } from "./ImageUploader";
 import { RichTextEditor } from "./RichTextEditor";
 
@@ -81,7 +81,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         headers: { Authorization: `Bearer ${token}` },
       });
       if (usersRes.ok) {
-        const usersData = await usersRes.json();
+        const usersData = await parseJsonResponse<{ users?: any[] }>(usersRes);
         setPendingMembers(usersData.users || []);
       }
 
@@ -90,7 +90,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         headers: { Authorization: `Bearer ${token}` },
       });
       if (postsRes.ok) {
-        const postsData = await postsRes.json();
+        const postsData = await parseJsonResponse<{ posts?: any[] }>(postsRes);
         setPendingPosts(postsData.posts || []);
       }
 
@@ -98,7 +98,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         headers: { Authorization: `Bearer ${token}` },
       });
       if (messagesRes.ok) {
-        setGuestMessages(await messagesRes.json());
+        setGuestMessages(await parseJsonResponse<any[]>(messagesRes));
       }
     } catch (error) {
       console.error("Failed to fetch moderation queue:", error);
@@ -143,7 +143,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         body: JSON.stringify({ status: newStatus }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
       if (res.ok) {
         setMessage(`User status updated to '${newStatus}' successfully.`);
         setPendingMembers(pendingMembers.filter((m) => m.id !== userId));
@@ -167,7 +167,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         body: JSON.stringify({ status: newStatus }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
       if (res.ok) {
         setMessage(`Post status updated to '${newStatus}' successfully.`);
         setPendingPosts(pendingPosts.filter((p) => p.id !== postId));
@@ -204,7 +204,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
       if (res.ok) {
         setMessage("Event published successfully!");
         setEventTitle("");
@@ -250,7 +250,7 @@ export const ModerationPanel: React.FC<ModerationPanelProps> = ({ currentUser })
         }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ error?: string }>(res);
       if (res.ok) {
         setMessage("Fundraising campaign published successfully!");
         setCampTitle("");

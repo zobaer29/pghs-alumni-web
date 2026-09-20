@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { confirmAction, showError, showSuccess } from "@/lib/alerts";
-import { API_BASE, apiUrl } from "@/lib/api";
+import { API_BASE, apiUrl, parseJsonResponse } from "@/lib/api";
 
 export type DetailType = "event" | "campaign";
 export type CurrentUser = Record<string, any> & {
@@ -50,7 +50,7 @@ export function useHomePage() {
               Authorization: `Bearer ${parsedUser.token}`,
             },
           })
-            .then((res) => (res.ok ? res.json() : null))
+            .then((res) => (res.ok ? parseJsonResponse<{ user?: any }>(res) : null))
             .then((data) => {
               if (data?.user) {
                 setCurrentUser((prev) => {
@@ -82,14 +82,14 @@ export function useHomePage() {
 
   useEffect(() => {
     fetch(apiUrl("/api/events"))
-      .then((res) => res.json())
+      .then((res) => parseJsonResponse(res))
       .then((data) => {
         if (Array.isArray(data)) setDbEvents(data);
       })
       .catch(() => {});
 
     fetch(apiUrl("/api/campaigns"))
-      .then((res) => res.json())
+      .then((res) => parseJsonResponse(res))
       .then((data) => {
         if (Array.isArray(data)) setDbCampaigns(data);
       })

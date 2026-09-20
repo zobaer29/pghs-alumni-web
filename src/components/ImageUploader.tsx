@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Upload, Image as ImageIcon, X, Loader2, Link as LinkIcon } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 
 interface ImageUploaderProps {
   value: string;
@@ -89,7 +89,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           });
 
           if (res.ok) {
-            const data = await res.json();
+            const data = await parseJsonResponse<{ url?: string }>(res);
             if (data.url) {
               uploadedUrl = data.url;
             }
@@ -119,7 +119,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         });
 
         if (res.ok) {
-          const result = await res.json();
+          const result = await parseJsonResponse<{ success?: boolean; data?: { url?: string } }>(res);
           if (result.success && result.data?.url) {
             uploadedUrl = result.data.url;
           }

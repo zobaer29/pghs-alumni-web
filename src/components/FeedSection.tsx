@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { confirmAction, showError, showSuccess } from "@/lib/alerts";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 import { Image as ImageIcon, Send, ShieldCheck, Clock, RefreshCw, Sparkles, MessageCircle, Trash2, Lock, LogIn, LoaderCircle } from "lucide-react";
 import { ImageUploader } from "./ImageUploader";
 
@@ -39,7 +39,7 @@ export const FeedSection: React.FC<FeedSectionProps> = ({ currentUser, onRequire
       });
 
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseJsonResponse<{ posts?: any[]; pagination?: { page?: number; totalPages?: number } }>(res);
         setPosts((prev) => (append ? [...prev, ...(data.posts || [])] : data.posts || []));
         setCurrentPage(data.pagination?.page || page);
         setHasMore((data.pagination?.page || page) < (data.pagination?.totalPages || page));
@@ -101,7 +101,7 @@ export const FeedSection: React.FC<FeedSectionProps> = ({ currentUser, onRequire
         }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ autoApproved?: boolean; error?: string }>(res);
 
       if (res.ok) {
         if (data.autoApproved) {

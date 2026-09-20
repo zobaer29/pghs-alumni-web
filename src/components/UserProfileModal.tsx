@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { X, User, ShieldCheck, Mail, Phone, MapPin, Briefcase, GraduationCap, Globe, Link, Camera, Edit3, Save, Sparkles, Check, Lock, Award, HeartHandshake } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, parseJsonResponse } from "@/lib/api";
 import { ImageUploader } from "./ImageUploader";
 
 interface UserProfileModalProps {
@@ -111,7 +111,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonResponse<{ user?: { profile?: any }; message?: string }>(res);
 
       if (res.ok && data.user) {
         setSuccessMessage("Your alumni profile has been updated successfully!");
