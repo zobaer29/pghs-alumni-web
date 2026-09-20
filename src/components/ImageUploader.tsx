@@ -70,6 +70,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setIsUploading(true);
     setError(null);
 
+    if (!token) {
+      setError("Please log in before uploading an image.");
+      setIsUploading(false);
+      return;
+    }
+
     try {
       // 1. Compress Image File before Upload
       const base64 = await compressImage(file, 1200, 1200, 0.75);
@@ -77,36 +83,36 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       let uploadedUrl: string | null = null;
 
       // 2. Try Backend API first (/api/upload)
-      if (token) {
-        try {
-          const res = await fetch(apiUrl("/api/upload"), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ image: base64 }),
-          });
+      try {
+        const res = await fetch(apiUrl("/api/upload"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ image: base64 }),
+        });
 
-          if (res.ok) {
-            const data = await parseJsonResponse<{ url?: string }>(res);
-            if (data.url) {
-              uploadedUrl = data.url;
-            }
-          }
-        } catch {
-          // Backend API unreachable, will fallback to direct ImgBB
+        const data = await parseJsonResponse<{ url?: string; message?: string }>(res);
+        if (!res.ok) {
+          throw new Error(data.message || `Image upload failed (${res.status}).`);
         }
+        if (data.url) {
+          uploadedUrl = data.url;
+        }
+      } catch (uploadError) {
+        const message = uploadError instanceof Error ? uploadError.message : "Image upload failed.";
+        throw new Error(`${message} Check the API server and its IMGBB_API_KEY configuration.`);
       }
 
       if (uploadedUrl) {
         onChange(uploadedUrl);
       } else {
-        setError("Image upload failed. Check the API server and its IMGBB_API_KEY configuration.");
+        setError("The API did not return an image URL. Check its IMGBB_API_KEY configuration.");
       }
     } catch (err) {
       console.error("Upload error:", err);
-      setError("An error occurred while uploading file.");
+      setError(err instanceof Error ? err.message : "An error occurred while uploading file.");
     } finally {
       setIsUploading(false);
     }
